@@ -19,6 +19,7 @@ import torch.nn as nn
 import torch.backends.cudnn as cudnn
 import torch.nn.functional as F
 from model.unipose import unipose
+from utils.utils import draw_paint
 
 from sklearn.externals import joblib
 
@@ -54,9 +55,9 @@ def get_kpts(maps, img_h = 368.0, img_w = 368.0):
 
 
 # Get keypoint coordinates from img
-def unipose_write(img_path):
+def unipose_write(img_path, dim_w, dim_h):
     center   = [184, 184]
-    img  = np.array(cv2.resize(cv2.imread(img_path),(368,368)), dtype=np.float32)
+    img  = np.array(cv2.resize(cv2.imread(img_path),(dim_w,dim_h)), dtype=np.float32)
     img  = img.transpose(2, 0, 1)
     img  = torch.from_numpy(img)
     mean = [128.0, 128.0, 128.0]
@@ -72,9 +73,10 @@ def unipose_write(img_path):
     heat = model(input_var)
     heat = F.interpolate(heat, size=input_var.size()[2:], mode='bilinear', align_corners=True)
 
-    kpts = get_kpts(heat, img_h=368.0, img_w=368.0)
+    kpts = get_kpts(heat, img_h=float(dim_h), img_w=float(dim_w))
 
-    im = cv2.resize(cv2.imread(img_path),(368,368))
+    im = cv2.resize(cv2.imread(img_path),(dim_w,dim_h))
+    
     for i, kpt in enumerate(kpts):
         x, y = kpt
         cv2.circle(im, (x, y), 5, (0, 255, 255), thickness=-1, lineType=cv2.FILLED)
@@ -123,19 +125,39 @@ def inference_model(class_name, test_img_path, model_dir='classifier'):
     scaler_name = os.path.join(model_dir, scaler_name)
     scaler = joblib.load(scaler_name)
 
+
     X_test = []
-    img, points=unipose_write(test_img_path)
-    cv2.imwrite("infered_img.jpg", img) # !!!!
+    img, points=unipose_write(test_img_path, 640, 480)
     for i,j in points:
       X_test.append(i)
       X_test.append(j)
     X_test += angular_calculate(points)
 
+    draw_paint(img, points, 1, 0, 'warp', 'MPII')
+
+    X_test = []
+    img, points=unipose_write(test_img_path, 368, 368)
+    for i,j in points:
+      X_test.append(i)
+      X_test.append(j)
+    X_test += angular_calculate(points)
+
+    # print(len(points), points)
+
+    # cv2.imwrite("infered_img.jpg", img) # !!!!
+    draw_paint(img, points, 1, 0, 'warp', 'MPII')
+
     X_test = scaler.transform([X_test])
     pred = classifier.predict(X_test)
-
+    # print(X_test)
+    # print(pred)
     return bool(pred)
 
 if __name__ == "__main__":
-    # inference_model('pushup', 'test.jpeg', model_dir='classifier')
-    print(inference_model('pushup', 'pushup_test_m.jpg', model_dir='classifier'))
+    inference_model('pushup', 'test.jpg', model_dir='classifier')
+    # print(inference_model('pushup', 'pushup_test.jpg', model_dir='classifier'))
+    # print(inference_model('pushup', 'plank_test.jpg', model_dir='classifier'))
+    # print(inference_model('pullup', 'pullup_test.jpg', model_dir='classifier'))
+    # print(inference_model('plank', 'plank_test.jpg', model_dir='classifier'))
+    # print(inference_model('pushup', 'plank_test.jpg', model_dir='classifier'))
+    # print(inference_model('squat', 'squat_test.jpg', model_dir='classifier'))
