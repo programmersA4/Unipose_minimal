@@ -1,16 +1,15 @@
 # Unipose_minimal
-
 <p align="justify">
   <strong>HMM 습관 인증 Pre-Trained weights</strong> / 
   <a href="https://github.com/programmersA4/UniPose_minimal/releases/">페이지</a>
   / 
   <a href="https://github.com/programmersA4/Unipose_minimal/releases/download/untagged-96faa91c1481761ff602/UniPose_COCO.pth">다운로드 링크</a>
-</p><br/>
-
+</p>
+<br/>
+<br/>
 
 
 <hr/>
-<br/>
 
 ## Unipose (original)
 
