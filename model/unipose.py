@@ -1,9 +1,9 @@
 import torch
 import torch.nn as nn
 import torch.nn.functional as F
-from model.modules.wasp import build_wasp
-from model.modules.decoder import build_decoder
-from model.modules.backbone import build_backbone
+from Unipose.model.modules.wasp import build_wasp
+from Unipose.model.modules.decoder import build_decoder
+from Unipose.model.modules.backbone import build_backbone
 
 class unipose(nn.Module):
     def __init__(self, dataset, backbone='resnet', output_stride=16, num_classes=21,

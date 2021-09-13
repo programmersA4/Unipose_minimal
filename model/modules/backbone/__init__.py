@@ -1,4 +1,4 @@
-from model.modules.backbone import resnet
+from Unipose.model.modules.backbone import resnet
 
 def build_backbone(backbone, output_stride, BatchNorm):
     if backbone == 'resnet':

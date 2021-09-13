@@ -18,15 +18,15 @@ import torch.optim
 import torch.nn as nn
 import torch.backends.cudnn as cudnn
 import torch.nn.functional as F
-from model.unipose import unipose
-from utils.utils import draw_paint
+from Unipose.model.unipose import unipose
+from Unipose.utils.utils import draw_paint
 
 from sklearn.externals import joblib
 
 
 # Load pretrained unipose model
 model = unipose(dataset='COCO', num_classes=16, backbone='resnet', output_stride=16, sync_bn=True, freeze_bn=False, stride=8)
-checkpoint = torch.load('pretrained/UniPose_COCO.pth', map_location=torch.device('cpu'))
+checkpoint = torch.load('Unipose/pretrained/UniPose_COCO.pth', map_location=torch.device('cpu'))
 p = checkpoint
 
 state_dict = model.state_dict()
@@ -127,15 +127,6 @@ def inference_model(class_name, test_img_path, model_dir='classifier'):
 
 
     X_test = []
-    img, points=unipose_write(test_img_path, 640, 480)
-    for i,j in points:
-      X_test.append(i)
-      X_test.append(j)
-    X_test += angular_calculate(points)
-
-    draw_paint(img, points, 1, 0, 'warp', 'MPII')
-
-    X_test = []
     img, points=unipose_write(test_img_path, 368, 368)
     for i,j in points:
       X_test.append(i)
@@ -145,16 +136,18 @@ def inference_model(class_name, test_img_path, model_dir='classifier'):
     # print(len(points), points)
 
     # cv2.imwrite("infered_img.jpg", img) # !!!!
-    draw_paint(img, points, 1, 0, 'warp', 'MPII')
-
+    # img, points=unipose_write(test_img_path, 480, 640)
+    img_path = test_img_path.replace('auth', 'infered')
+    draw_paint(img, points, img_path, 'MPII')
+    
     X_test = scaler.transform([X_test])
     pred = classifier.predict(X_test)
     # print(X_test)
     # print(pred)
     return bool(pred)
 
-if __name__ == "__main__":
-    inference_model('pushup', 'test.jpg', model_dir='classifier')
+# if __name__ == "__main__":
+    # inference_model('pushup', 'test.jpg', model_dir='classifier')
     # print(inference_model('pushup', 'pushup_test.jpg', model_dir='classifier'))
     # print(inference_model('pushup', 'plank_test.jpg', model_dir='classifier'))
     # print(inference_model('pullup', 'pullup_test.jpg', model_dir='classifier'))

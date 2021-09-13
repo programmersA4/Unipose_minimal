@@ -1,14 +1,14 @@
 from collections import namedtuple
 
-from utils       import lsp_lspet_data       as lsp_lspet_data
-from utils       import mpii_data            as mpii_data
-from utils       import mpii_data            as Mpii
+from Unipose.utils       import lsp_lspet_data       as lsp_lspet_data
+from Unipose.utils       import mpii_data            as mpii_data
+# from Unipose.utils       import mpii_data            as Mpii
 # from utils       import coco_data            as coco_data
-from utils       import penn_action_data     as penn_action
+from Unipose.utils       import penn_action_data     as penn_action
 # from utils       import ntid_data            as ntid_data
 # from utils       import posetrack_data       as posetrack_data
-from utils       import bbc_data             as bbc_data
-import utils.Mytransforms as Mytransforms
+from Unipose.utils       import bbc_data             as bbc_data
+import Unipose.utils.Mytransforms as Mytransforms
 import torch.nn.functional as F
 import math
 import torch
@@ -106,7 +106,7 @@ def get_kpts(maps, img_h = 368.0, img_w = 368.0):
     return kpts
 
 
-def draw_paint(im, kpts, mapNumber, epoch, model_arch, dataset):
+def draw_paint(im, kpts, path, dataset):
 
            #       RED           GREEN           RED          YELLOW          YELLOW          PINK          GREEN
     colors = [[000,000,255], [000,255,000], [000,000,255], [255,255,000], [255,255,000], [255,000,255], [000,255,000],\
@@ -198,7 +198,8 @@ def draw_paint(im, kpts, mapNumber, epoch, model_arch, dataset):
 
         im = cv2.addWeighted(im, 0.2, cur_im, 0.8, 0)
 
-    cv2.imwrite('infered'+str(mapNumber)+'.png', im)
+    # cv2.imwrite(path, im)
+    cv2.imwrite(path, cv2.resize(im, (640, 480)))
 
 
 def guassian_kernel(size_w, size_h, center_x, center_y, sigma):

@@ -1,7 +1,7 @@
 # -*-coding:UTF-8-*-
 from __future__ import print_function, absolute_import
 
-import utils.Mytransforms as Mytransforms
+import Unipose.utils.Mytransforms as Mytransforms
 import numpy as np
 import random
 import scipy
